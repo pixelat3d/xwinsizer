@@ -18,6 +18,11 @@ prompt_color='\033[0m' #34
 num_color='\033[0;34m'
 entry_color='\033[1;37m'
 
+
+#quick dirty hack for some opts
+supress=
+
+
 AppHeader()
 {
 echo -e "
@@ -76,7 +81,7 @@ GetInput()
 		user_input=$(($user_input - 1))
 		IFS=$' ' handle=(${windows[$user_input]})
 
-		if [[ $borderless ]]; then
+		if [ "$borderless" ]; then
 			xprop -id ${handle} -format _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS 2
 		fi
 
@@ -103,36 +108,58 @@ WindowList()
 	GetInput
 }
 
-args=$(getopt -a -n xwinsizer -o lbw:h:x:y:d: --long "help",list,borderless,width:,height:,xoffset:,yoffset: -- "$@")
+args=$(getopt -a -n xwinsizer -o lbw:h:x:y: --long "help",list,borderless,width:,height:,xoffset:,yoffset: -- "$@")
 valid_args=$?
 if [ "$valid_args" != "0" ]; then
 	CmdHelp
+	supress=true
 fi
 
 eval set -- "$args"
 while :
 do
 	case "$1" in 
-		--help ) CmdHelp ; shift;;
-		-l | --list ) echo -e "id | dt | host | name"; echo -e "$(wmctrl -l)" ; shift;;
-		-b | --borderless) borderless=true; shift;;
-		-w | --width) width="$2" ; shift 2;;
-		-h | --height) height="$2" ; shift 2;;
-		-x | --xoffset) x_offset=$2 ; shift 2;;
-		-y | --yoffset) y_offset=$2 ; shift 2;;
-		--) shift; break;;
-		*) echo 'invalid opts' ;;
+		--help ) 
+			CmdHelp;
+			supress=true;
+		       	shift;;
+		-l | --list ) 
+			echo -e "id | dt | host | title"; 
+			echo -e "$(wmctrl -l)"; 
+			supress=true;
+			shift;;
+		-b | --borderless) 
+			borderless=true;
+			shift;;
+		-w | --width) 
+			width="$2"; 
+			shift 2;;
+		-h | --height) 
+			height="$2"; 
+			shift 2;;
+		-x | --xoffset) 
+			x_offset=$2; 
+			shift 2;;
+		-y | --yoffset) 
+			y_offset=$2; 
+			shift 2;;
+		--) 
+			shift; 
+			break;;
+		*) 
+			echo 'invalid opts';;
 	esac
 done
 
 if [ "$1" ]; then
-
-	if [[ $borderless ]]; then
-		xprop -id ${1} -format _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS 2
+	if [ "$borderless" ]; then
+		xprop -id "${1}" -format _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS 2
 	fi
 
-	wmctrl -i -r ${1} -e 0,${x_offset},${y_offset},${width},${height}
+	wmctrl -i -r "${1}" -e 0,"${x_offset}","${y_offset}","${width}","${height}"
 else
-	WindowList
+	if [ ! "$supress" ]; then
+		WindowList
+	fi
 fi
 
