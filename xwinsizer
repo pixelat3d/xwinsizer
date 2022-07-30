@@ -57,13 +57,15 @@ CmdHelp()
    # Display Help
    echo "xwinsizer: Take control of your windows. version ${version}"
    echo
-   echo "Syntax: xwinsizer [-b | --borderless] [-w | --width] [-h | --height] [-x | --xoffset] [-y | --yoffset] <window_id>"
+   echo "Syntax: xwinsizer <window_id> [-b | --borderless] [-w | --width] [-h | --height] [-x | --xoffset] [-y | --yoffset]"
    echo "options:"
    echo "-b | --borderless	Make the Window Borderless"
    echo "-h | --height		Set the width of the window"
    echo "-w | --width		Set the height of the window"
    echo "-x | --xoffset		x offset from the left of screen"
    echo "-y | --yoffset		Y offset from the top of screen"
+   echo "-l | --list		Dispaly a static list of windows along with their ids"
+   echo "--help			Dispaly this screen" 
    echo
 }
 
