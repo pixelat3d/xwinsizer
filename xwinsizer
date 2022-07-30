@@ -126,6 +126,11 @@ do
 done
 
 if [ "$1" ]; then
+
+	if [[ $borderless ]]; then
+		xprop -id ${1} -format _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS 2
+	fi
+
 	wmctrl -i -r ${1} -e 0,${x_offset},${y_offset},${width},${height}
 else
 	WindowList
