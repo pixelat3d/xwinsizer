@@ -1,0 +1,133 @@
+#!/bin/bash
+
+version=1.0
+
+#Change these values to what you're looking for.
+# -1 is "do not modify window"
+x_offset=-1
+y_offset=-1
+height=-1
+width=-1
+
+#Populate this with anything to make it "true" blank is false.
+borderless=
+
+#Colors
+no_color='\033[0m'
+prompt_color='\033[0m' #34
+num_color='\033[0;34m'
+entry_color='\033[1;37m'
+
+AppHeader()
+{
+echo -e "
+____  ___         .__                 .__                         
+\   \/  /__  _  __|__|  ____    ______|__|________  ____ _______  
+ \     / \ \/ \/ /|  | /    \  /  ___/|  |\___   /_/ __ \\_  __ \ 
+ /     \  \     / |  ||   |  \ \___ \ |  | /    / \  ___/ |  | \/ 
+/___/\  \  \/\_/  |__||___|  //____  >|__|/_____ \ \___  >|__|    
+      \_/                  \/      \/           \/     \/         
+=================================================================\n"
+}
+
+AppHelp()
+{
+	clear
+	AppHeader
+
+	echo "Help"
+	echo "Enter the number that's next to the window you want to modify."
+	echo "Press <control>+C or q to quit"
+	echo "Press r to refresh the window list"
+
+	echo "Command Line Options: "
+	CmdHelp
+
+	echo -n "Press r to go back or q to quit:"
+	GetInput
+}
+
+CmdHelp()
+{
+   # Display Help
+   echo "xwinsizer: Take control of your windows. version ${version}"
+   echo
+   echo "Syntax: xwinsizer [-b | --borderless] [-w | --width] [-h | --height] [-x | --xoffset] [-y | --yoffset] <window_id>"
+   echo "options:"
+   echo "-b | --borderless	Make the Window Borderless"
+   echo "-h | --height		Set the width of the window"
+   echo "-w | --width		Set the height of the window"
+   echo "-x | --xoffset		x offset from the left of screen"
+   echo "-y | --yoffset		Y offset from the top of screen"
+   echo
+}
+
+GetInput()
+{
+	read user_input
+
+	if [ "$user_input" = 'r' ] || [ "$user_input" = 'R' ]; then
+		WindowList
+	elif [ "$user_input" = 'h' ] || [  "$user_input" = 'H' ]; then
+		AppHelp
+	elif [ "$user_input" = 'q' ] || [ "$user_input" = 'Q' ]; then
+		exit 0
+	else
+		user_input=$(($user_input - 1))
+		IFS=$' ' handle=(${windows[$user_input]})
+
+		if [[ $borderless ]]; then
+			xprop -id ${handle} -format _MOTIF_WM_HINTS 32c -set _MOTIF_WM_HINTS 2
+		fi
+
+		wmctrl -i -r ${handle} -e 0,${x_offset},${y_offset},${width},${height}
+	fi
+}
+
+WindowList()
+{
+	clear
+	AppHeader
+
+	#Get window list from wmctrl
+	IFS=$'\n' windows=( $(wmctrl -l) )
+
+	i=0
+	for win in "${windows[@]}"; do
+		win_name=${win##*blep}
+		i=$((i+1));
+		echo -e "${num_color}${i}) ${entry_color}${win_name}${no_color}"
+	done
+	echo -ne "${prompt_color}Enter Number or press h for help: ${no_color}"
+
+	GetInput
+}
+
+args=$(getopt -a -n xwinsizer -o lbw:h:x:y:d: --long "help",list,borderless,width:,height:,xoffset:,yoffset: -- "$@")
+valid_args=$?
+if [ "$valid_args" != "0" ]; then
+	CmdHelp
+fi
+
+eval set -- "$args"
+while :
+do
+	case "$1" in 
+		--help ) CmdHelp ; shift;;
+		-l | --list ) echo -e "id | dt | host | name"; echo -e "$(wmctrl -l)" ; shift;;
+		-b | --borderless) borderless=true; shift;;
+		-w | --width) width="$2" ; shift 2;;
+		-h | --height) height="$2" ; shift 2;;
+		-x | --xoffset) x_offset=$2 ; shift 2;;
+		-y | --yoffset) y_offset=$2 ; shift 2;;
+		--) shift; break;;
+		*) echo 'invalid opts' ;;
+	esac
+done
+
+if [ "$1" ]; then
+	wmctrl -i -r ${1} -e 0,${x_offset},${y_offset},${width},${height}
+else
+	WindowList
+fi
+
