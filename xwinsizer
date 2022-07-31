@@ -159,7 +159,7 @@ WindowList()
 {
 	clear
 	AppHeader
-	echo -e "${prompt_color}O for options, H for help, R to refresh list ${no_color}"
+	echo -e "O for options, H for help, R to refresh list, Q to quit"
 	echo
 
 	#Get window list from wmctrl
