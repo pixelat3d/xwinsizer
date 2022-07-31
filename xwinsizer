@@ -17,9 +17,9 @@ no_color='\033[0m'
 prompt_color='\033[0m'
 num_color='\033[0;34m'
 entry_color='\033[1;37m'
+hostname=$(hostname)
 
-
-#quick dirty hack for some opts
+#Supress main menu sometimes
 supress=
 
 
@@ -168,7 +168,7 @@ WindowList()
 
 	i=0
 	for win in "${windows[@]}"; do
-		win_name=${win##*blep}
+		win_name=${win##*${hostname}}
 		i=$((i+1));
 		echo -e "${num_color}${i}) ${entry_color}${win_name}${no_color}"
 	done
