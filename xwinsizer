@@ -169,6 +169,11 @@ WindowList()
 	for win in "${windows[@]}"; do
 		win_name=${win##*${hostname}}
 		win_name=${win_name##*N/A}
+
+		if [ ! "$win_name" ]; then
+			win_name=" <No title>"
+		fi
+
 		i=$((i+1));
 		echo -e "${num_color}${i}) ${entry_color}${win_name}${no_color}"
 	done
