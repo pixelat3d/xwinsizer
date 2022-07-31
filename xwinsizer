@@ -14,7 +14,7 @@ borderless=
 
 #Colors
 no_color='\033[0m'
-prompt_color='\033[0m' #34
+prompt_color='\033[0m'
 num_color='\033[0;34m'
 entry_color='\033[1;37m'
 
@@ -41,14 +41,17 @@ AppHelp()
 	AppHeader
 
 	echo "Help"
-	echo "Enter the number that's next to the window you want to modify."
-	echo "Press <control>+C or q to quit"
-	echo "Press r to refresh the window list"
-
+	echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+	echo " Enter the number that corresponds to the window you would like to modify."
+	echo " <control>+C or Q to quit"
+	echo " R to refresh the window list"
+	echo " O for options"
+	echo
 	echo "Command Line Options: "
+	echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
 	CmdHelp
-
-	echo -n "Press r to go back or q to quit:"
+	echo
+	echo -n "Press R to go back O for options or Q to quit:"
 	GetInput
 }
 
@@ -59,14 +62,74 @@ CmdHelp()
    echo
    echo "Syntax: xwinsizer <window_id> [-b | --borderless] [-w | --width] [-h | --height] [-x | --xoffset] [-y | --yoffset]"
    echo "options:"
-   echo "-b | --borderless	Make the Window Borderless"
-   echo "-h | --height		Set the width of the window"
-   echo "-w | --width		Set the height of the window"
-   echo "-x | --xoffset		x offset from the left of screen"
-   echo "-y | --yoffset		Y offset from the top of screen"
-   echo "-l | --list		Dispaly a static list of windows along with their ids"
-   echo "--help			Dispaly this screen" 
+   echo " -b | --borderless	Make the Window Borderless"
+   echo " -h | --height		Set the width of the window"
+   echo " -w | --width		Set the height of the window"
+   echo " -x | --xoffset		x offset from the left of screen"
+   echo " -y | --yoffset		Y offset from the top of screen"
+   echo " -l | --list		Dispaly a static list of windows along with their ids"
+   echo " --help			Dispaly this screen" 
    echo
+}
+
+OptionsMenu()
+{
+	clear
+	AppHeader
+	echo "Options"
+	echo "-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-"
+
+	echo -e " ${num_color}1)${entry_color} Borderless:${no_color} ${borderless}"
+	echo "    Default:"
+	echo
+
+	echo -e " ${num_color}2)${entry_color} Width:${no_color} ${width}"
+	echo "    Default: -1"
+	echo
+
+	echo -e " ${num_color}3)${entry_color} Height:${no_color} ${height}"
+	echo "    Default: -1"
+	echo
+
+	echo -e " ${num_color}4)${entry_color} X Position:${no_color} ${x_offset}"
+	echo "    Default: -1"
+	echo
+
+	echo -e " ${num_color}5)${entry_color} Y Position:${no_color}${y_offset}"
+	echo "    Default: -1"
+	echo
+
+	echo -n "Enter selection or press r to return:"
+	read user_input
+
+	if [ "$user_input" = '1' ] ; then
+		echo -n "Enter New Value for Borderless (empty for false):"
+		read new_value
+		borderless="$new_value"
+	elif [ "$user_input" = '2' ]; then
+		echo -n "Enter New Value for Width:"
+		read new_vale
+		width="$new_value"
+	elif [ "$user_input" = '3' ]; then
+		echo -n "Enter New Value for Height:"
+		read new_value
+		height="$new_value"
+	elif [ "$user_input" = '4' ]; then
+		echo -n "Enter New Value for X:"
+		read new_value
+		x_offset="$new_value"
+	elif [ "$user_input" = '5' ]; then
+		echo -n "Enter New Value for Y:"
+		read new_value
+		y_offset="$new_value"
+	elif [ "$user_input" = 'r' ] || [ "$user_ipnut" = 'R' ]; then
+		AppHeader
+		WindowList
+	elif [ "$user_input" = 'q' ] || [ "$user_ipnut" = 'Q' ]; then
+		exit 0
+	fi
+
+	OptionsMenu
 }
 
 GetInput()
@@ -77,6 +140,8 @@ GetInput()
 		WindowList
 	elif [ "$user_input" = 'h' ] || [  "$user_input" = 'H' ]; then
 		AppHelp
+	elif [ "$user_input" = 'o' ] || [ "$user_input" = 'O' ]; then
+		OptionsMenu
 	elif [ "$user_input" = 'q' ] || [ "$user_input" = 'Q' ]; then
 		exit 0
 	else
@@ -95,6 +160,8 @@ WindowList()
 {
 	clear
 	AppHeader
+	echo -e "${prompt_color}O for options, H for help, R to refresh list ${no_color}"
+	echo
 
 	#Get window list from wmctrl
 	IFS=$'\n' windows=( $(wmctrl -l) )
@@ -105,7 +172,9 @@ WindowList()
 		i=$((i+1));
 		echo -e "${num_color}${i}) ${entry_color}${win_name}${no_color}"
 	done
-	echo -ne "${prompt_color}Enter Number or press h for help: ${no_color}"
+	echo
+
+	echo -ne "${prompt_color}Make Selection:${no_color}"
 
 	GetInput
 }
