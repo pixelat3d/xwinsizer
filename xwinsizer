@@ -2,26 +2,25 @@
 
 version=1.0
 
-#Change these values to what you're looking for.
+# Default values:
 # -1 is "do not modify window"
 x_offset=-1
 y_offset=-1
 height=-1
 width=-1
-
-#Populate this with anything to make it "true" blank is false.
 borderless=
 
-#Colors
+# Colors
 no_color='\033[0m'
 prompt_color='\033[0m'
 num_color='\033[0;34m'
 entry_color='\033[1;37m'
-hostname=$(hostname)
 
-#Supress main menu sometimes
+# Supress main menu sometimes
 supress=
 
+# Used to filter output from wmctrl.
+hostname=$(hostname) 
 
 AppHeader()
 {
